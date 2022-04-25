@@ -221,9 +221,6 @@ if query: # or query != '' :
         wc_text = ""
         if len(res_df) > 0:
             filter_res_df = res_df[res_df['page'] == st.session_state['page']]
-
-            filter_res_df
-
             for i in range(len(filter_res_df)):
                 score = round(filter_res_df['score'].values[i] * 100, 2)
                 content = filter_res_df['content'].values[i]
@@ -243,7 +240,7 @@ if query: # or query != '' :
                                                  filter_res_df['file_name'].values[i],
                                                 )
 
-                pdf_html = """<a href="http://pc140032646.bot.or.th/pdf/{}/{}/{}/{}" class="card-link">PDF</a> <a href='#linkto_top' class="card-link">Link to top</a> <a href='#linkto_bottom' class="card-link">Link to bottom</a>""".format(filter_res_df['full_path'].values[i][0],filter_res_df['full_path'].values[i][1],filter_res_df['full_path'].values[i][2],filter_res_df['full_path'].values[i][3])
+                pdf_html = """<a href="http://pc140032646.bot.or.th:8601/pdf/{}/{}/{}/{}" class="card-link">PDF</a> <a href='#linkto_top' class="card-link">Link to top</a> <a href='#linkto_bottom' class="card-link">Link to bottom</a>""".format(filter_res_df['full_path'].values[i][0],filter_res_df['full_path'].values[i][1],filter_res_df['full_path'].values[i][2],filter_res_df['full_path'].values[i][3])
 
                 card('Relevance: {}'.format(score), 
                     answer,
