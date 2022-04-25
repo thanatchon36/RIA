@@ -87,11 +87,17 @@ def load_wc(wc_text):
 
 st.set_page_config(layout="wide")
 
+def change_retriever_type():
+    if st.session_state['search_type'] == 'by keywords':
+        st.session_state['retriever_type'] = 'Exact Match'
+    else:
+        st.session_state['retriever_type'] = 'Semantic Search (DPR)'
+
 with st.sidebar:
     st.header("Options")
     search_type = st.radio(
         "Search Type:",
-        ('by keywords', 'by questions'), key = "search_type")        
+        ('by keywords', 'by questions'), key = "search_type", on_change = change_retriever_type)        
     top_k_reader = st.sidebar.slider(
         "Max. number of answers:",
         min_value=1,
@@ -134,7 +140,10 @@ with c01:
 c11, c12, c13 = st.columns((6, 2, 2))
 
 with c11:
-    query = st.text_input('Search ' + st.session_state['search_type'], key = "query")
+    if st.session_state['search_type'] == 'by questions':
+        query = st.text_input('Search ' + st.session_state['search_type'], key = "query", placeholder = "What is the maximum finance charges for credit card?")
+    else:
+        query = st.text_input('Search ' + st.session_state['search_type'], key = "query")
 with c12:
     filter_meta = load_meta(st.session_state['doc_len'])
     filter_central_bank = list(filter_meta.json()['document']['central_bank'].keys())
