@@ -184,7 +184,8 @@ if query: # or query != '' :
             res_df['central_bank'] = res_df['meta'].apply(lambda x: x['central_bank'])
             res_df['keyword'] = res_df['meta'].apply(lambda x: x['keyword'])
             res_df['file_name'] = res_df['meta'].apply(lambda x: x['file_name'].split('/')[-1])
-            st.session_state['max_page'] = res_df['page'].max()
+            res_df['full_path'] = res_df['meta'].apply(lambda x: x['file_name'].split('/')[-4:])
+            st.session_state['m ax_page'] = res_df['page'].max()
 
     elif search_type == 'by keywords':
         post_params = {'query': st.session_state.query, 'top_k_retriever': top_k_retriever, 'top_k_reader': top_k_reader,
@@ -207,6 +208,7 @@ if query: # or query != '' :
             res_df['central_bank'] = res_df['meta'].apply(lambda x: x['central_bank'])
             res_df['keyword'] = res_df['meta'].apply(lambda x: x['keyword'])
             res_df['file_name'] = res_df['meta'].apply(lambda x: x['file_name'].split('/')[-1])
+            res_df['full_path'] = res_df['meta'].apply(lambda x: x['file_name'].split('/')[-4:])
             st.session_state['max_page'] = res_df['page'].max()
 
     # Init State Sessioin
@@ -241,8 +243,7 @@ if query: # or query != '' :
                                                  filter_res_df['file_name'].values[i],
                                                 )
 
-                # pdf_html = """<a href="http://pc140032646.bot.or.th/pdf/{}/{}/{}/{}" class="card-link">PDF</a> <a href='#linkto_top' class="card-link">Link to top</a> <a href='#linkto_bottom' class="card-link">Link to bottom</a>"""
-                pdf_html = """<a href="http://pc140032646.bot.or.th/pdf/asdf/adsf/asdfas/asdfas" class="card-link">PDF</a> <a href='#linkto_top' class="card-link">Link to top</a> <a href='#linkto_bottom' class="card-link">Link to bottom</a>"""
+                pdf_html = """<a href="http://pc140032646.bot.or.th/pdf/{}/{}/{}/{}" class="card-link">PDF</a> <a href='#linkto_top' class="card-link">Link to top</a> <a href='#linkto_bottom' class="card-link">Link to bottom</a>""".format(filter_res_df['full_path'].values[i][0],filter_res_df['full_path'].values[i][1],filter_res_df['full_path'].values[i][2],filter_res_df['full_path'].values[i][3])
 
                 card('Relevance: {}'.format(score), 
                     answer,
