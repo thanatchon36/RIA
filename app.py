@@ -121,8 +121,6 @@ with st.sidebar:
         index = 1,
     )
 
-pdf_html = """<a href="http://pc140032646.bot.or.th">PDF</a> <a href='#linkto_top' class="card-link">Link to top</a> <a href='#linkto_bottom' class="card-link">Link to bottom</a>"""
-
 st.markdown("""
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 """, unsafe_allow_html=True)
@@ -221,6 +219,9 @@ if query: # or query != '' :
         wc_text = ""
         if len(res_df) > 0:
             filter_res_df = res_df[res_df['page'] == st.session_state['page']]
+
+            filter_res_df
+
             for i in range(len(filter_res_df)):
                 score = round(filter_res_df['score'].values[i] * 100, 2)
                 content = filter_res_df['content'].values[i]
@@ -239,6 +240,9 @@ if query: # or query != '' :
                                                  filter_res_df['keyword'].values[i],
                                                  filter_res_df['file_name'].values[i],
                                                 )
+
+                # pdf_html = """<a href="http://pc140032646.bot.or.th/pdf/{}/{}/{}/{}" class="card-link">PDF</a> <a href='#linkto_top' class="card-link">Link to top</a> <a href='#linkto_bottom' class="card-link">Link to bottom</a>"""
+                pdf_html = """<a href="http://pc140032646.bot.or.th/pdf/asdf/adsf/asdfas/asdfas" class="card-link">PDF</a> <a href='#linkto_top' class="card-link">Link to top</a> <a href='#linkto_bottom' class="card-link">Link to bottom</a>"""
 
                 card('Relevance: {}'.format(score), 
                     answer,
