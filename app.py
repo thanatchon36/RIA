@@ -249,7 +249,7 @@ if query: # or query != '' :
                                                  filter_res_df['file_name'].values[i],
                                                 )
 
-                pdf_html = """<a href="http://pc140032646.bot.or.th:8601/pdf/{}/{}/{}/{}" class="card-link">PDF</a> <a href='#linkto_top' class="card-link">Link to top</a> <a href='#linkto_bottom' class="card-link">Link to bottom</a>""".format(filter_res_df['full_path'].values[i][0],filter_res_df['full_path'].values[i][1],filter_res_df['full_path'].values[i][2],filter_res_df['full_path'].values[i][3])
+                pdf_html = """<a href="http://pc140032646.bot.or.th/pdf/{}/{}/{}/{}" class="card-link">PDF</a> <a href='#linkto_top' class="card-link">Link to top</a> <a href='#linkto_bottom' class="card-link">Link to bottom</a>""".format(filter_res_df['full_path'].values[i][0],filter_res_df['full_path'].values[i][1],filter_res_df['full_path'].values[i][2],filter_res_df['full_path'].values[i][3])
 
                 card('Relevance: {}'.format(score), 
                     answer,
