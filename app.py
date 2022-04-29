@@ -322,13 +322,15 @@ if query: # or query != '' :
     suggested_keywords = load_suggested_keywords(post_params).json()
     suggested_list = suggested_keywords['suggested_keywords'][:12]
 
-    c31, c32, c33, c34, cx1 = st.columns((2, 2, 2, 2, 6))
+    c31, c32, cx1 = st.columns((4, 4, 4))
     with c31:
         sg_button_1 = st.button(suggested_list[0], on_click = click_button_sg1)
         st.session_state['sg_button_1'] = suggested_list[0]
     with c32:
         sg_button_2 = st.button(suggested_list[1], on_click = click_button_sg2)
         st.session_state['sg_button_2'] = suggested_list[1]
+
+    c33, c34, cx2 = st.columns((4, 4, 4))
     with c33:
         sg_button_3 = st.button(suggested_list[2], on_click = click_button_sg3)
         st.session_state['sg_button_3'] = suggested_list[2]
@@ -336,13 +338,15 @@ if query: # or query != '' :
         sg_button_4 = st.button(suggested_list[3], on_click = click_button_sg4)
         st.session_state['sg_button_4'] = suggested_list[3]
 
-    c35, c36, c37, c38, cx2 = st.columns((2, 2, 2, 2, 6))
+    c35, c36, cx3 = st.columns((4, 4, 4))
     with c35:
         sg_button_5 = st.button(suggested_list[4], on_click = click_button_sg5)
         st.session_state['sg_button_5'] = suggested_list[4]
     with c36:
         sg_button_6 = st.button(suggested_list[5], on_click = click_button_sg6)
         st.session_state['sg_button_6'] = suggested_list[5]
+
+    c37, c38, cx4 = st.columns((4, 4, 4))
     with c37:
         sg_button_7 = st.button(suggested_list[6], on_click = click_button_sg7)
         st.session_state['sg_button_7'] = suggested_list[6]
