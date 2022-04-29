@@ -74,9 +74,9 @@ def search_query(search_type, post_params, port, api_route, doc_len):
     return res
 
 @st.cache(allow_output_mutation=True)
-def load_meta(doc_len):
-    port = 5001 + int(doc_len)
-    api_route = 'haystack_{}_meta'.format(doc_len)
+def load_meta():
+    port = 6101
+    api_route = 'haystack_meta'.format(doc_len)
     res = requests.get('http://localhost:{}/{}'.format(port, api_route))
     return res
 
@@ -92,6 +92,17 @@ def change_retriever_type():
         st.session_state['retriever_type'] = 'Exact Match'
     else:
         st.session_state['retriever_type'] = 'Semantic Search (DPR)'
+
+def add_central_bank():
+    filter_list = []
+    for each in st.session_state['filter_central_bank']:
+        temp_list = st.session_state['filter_central_bank_dict'][each]
+        filter_list = filter_list + temp_list
+    filter_list = list(set(filter_list))
+    st.session_state['keyword_list'] = filter_list
+
+    if len(st.session_state['keyword_list']) == 0:
+        st.session_state['keyword_list'] = st.session_state['default_keyword_list']
 
 with st.sidebar:
     st.header("Options")
@@ -145,20 +156,31 @@ with c11:
     else:
         query = st.text_input('Search ' + st.session_state['search_type'], key = "query")
 with c12:
-    filter_meta = load_meta(st.session_state['doc_len'])
-    filter_central_bank = list(filter_meta.json()['document']['central_bank'].keys())
-    filter_keyword = list(filter_meta.json()['document']['keyword'].keys())
+    filter_meta = load_meta().json()
+    if 'default_central_bank_list' not in st.session_state:
+        st.session_state['default_central_bank_list'] = list(filter_meta['central_bank'].keys())
+    if 'default_keyword_list' not in st.session_state:
+        st.session_state['default_keyword_list'] = list(filter_meta['keyword'].keys())
+    if 'central_bank_list' not in st.session_state:
+        st.session_state['central_bank_list'] = list(filter_meta['central_bank'].keys())
+    if 'keyword_list' not in st.session_state:
+        st.session_state['keyword_list'] = list(filter_meta['keyword'].keys())
+    if 'filter_central_bank_dict' not in st.session_state:
+        st.session_state['filter_central_bank_dict'] = filter_meta['central_bank']
+    if 'filter_keyword_dict' not in st.session_state:
+        st.session_state['filter_keyword_dict'] = filter_meta['keyword']
     
     filter_central_bank = st.multiselect(
         'Filter Central Banks:',
-        filter_central_bank,
+         st.session_state['central_bank_list'],
         [],
-        key = 'filter_central_bank',    
+        key = 'filter_central_bank',
+        on_change = add_central_bank,
     )
 with c13:
     filter_keyword = st.multiselect(
         'Filter Categories:',
-        filter_keyword,
+        st.session_state['keyword_list'],
         [],
         key = 'filter_keyword',
     )
@@ -230,6 +252,7 @@ if query: # or query != '' :
         wc_text = ""
         if len(res_df) > 0:
             filter_res_df = res_df[res_df['page'] == st.session_state['page']]
+
             for i in range(len(filter_res_df)):
                 score = round(filter_res_df['score'].values[i] * 100, 2)
                 content = filter_res_df['content'].values[i]
