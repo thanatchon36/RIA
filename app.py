@@ -85,6 +85,13 @@ def load_wc(wc_text):
     wc_fig = wc.generate_from_text(wc_text)
     return wc_fig
 
+@st.cache(allow_output_mutation=True)
+def load_suggested_keywords(post_params):
+    port = 7101
+    api_route = 'haystack_collocation'
+    res = requests.post('http://localhost:{}/{}'.format(port, api_route), json = post_params)
+    return res
+
 st.set_page_config(layout="wide")
 
 def change_retriever_type():
@@ -103,6 +110,23 @@ def add_central_bank():
 
     if len(st.session_state['keyword_list']) == 0:
         st.session_state['keyword_list'] = st.session_state['default_keyword_list']
+
+def click_button_sg1():
+    st.session_state['query'] = st.session_state['sg_button_1']
+def click_button_sg2():
+    st.session_state['query'] = st.session_state['sg_button_2']
+def click_button_sg3():
+    st.session_state['query'] = st.session_state['sg_button_3']
+def click_button_sg4():
+    st.session_state['query'] = st.session_state['sg_button_4']
+def click_button_sg5():
+    st.session_state['query'] = st.session_state['sg_button_5']
+def click_button_sg6():
+    st.session_state['query'] = st.session_state['sg_button_6']
+def click_button_sg7():
+    st.session_state['query'] = st.session_state['sg_button_7']
+def click_button_sg8():
+    st.session_state['query'] = st.session_state['sg_button_8']
 
 with st.sidebar:
     st.header("Options")
@@ -229,6 +253,7 @@ if query: # or query != '' :
         port = 5001 + int(doc_len)
         api_route = 'haystack_{}_retriever_pipe'.format(doc_len)
         res = search_query(search_type, post_params, port, api_route, doc_len)
+        st.write("## Results:")
         res_df = pd.DataFrame(res.json()['documents'])
         if len(res_df) > 0:
             res_df['score'] = res_df['score'].astype(float)
@@ -288,11 +313,47 @@ if query: # or query != '' :
             plt.axis('off')
             st.pyplot(fig)
 
+    st.write("#### Suggested Keywords:")
+    post_params = {'query': st.session_state.query, 'filters': {}, }
+    if len(st.session_state['filter_central_bank']) > 0:
+        post_params['filters']['central_bank'] = st.session_state['filter_central_bank']
+    if len(st.session_state['filter_keyword']) > 0:
+        post_params['filters']['keyword'] = st.session_state['filter_keyword']
+    suggested_keywords = load_suggested_keywords(post_params).json()
+    suggested_list = suggested_keywords['suggested_keywords'][:12]
+
+    c31, c32, c33, c34, cx1 = st.columns((2, 2, 2, 2, 6))
+    with c31:
+        sg_button_1 = st.button(suggested_list[0], on_click = click_button_sg1)
+        st.session_state['sg_button_1'] = suggested_list[0]
+    with c32:
+        sg_button_2 = st.button(suggested_list[1], on_click = click_button_sg2)
+        st.session_state['sg_button_2'] = suggested_list[1]
+    with c33:
+        sg_button_3 = st.button(suggested_list[2], on_click = click_button_sg3)
+        st.session_state['sg_button_3'] = suggested_list[2]
+    with c34:
+        sg_button_4 = st.button(suggested_list[3], on_click = click_button_sg4)
+        st.session_state['sg_button_4'] = suggested_list[3]
+
+    c35, c36, c37, c38, cx2 = st.columns((2, 2, 2, 2, 6))
+    with c35:
+        sg_button_5 = st.button(suggested_list[4], on_click = click_button_sg5)
+        st.session_state['sg_button_5'] = suggested_list[4]
+    with c36:
+        sg_button_6 = st.button(suggested_list[5], on_click = click_button_sg6)
+        st.session_state['sg_button_6'] = suggested_list[5]
+    with c37:
+        sg_button_7 = st.button(suggested_list[6], on_click = click_button_sg7)
+        st.session_state['sg_button_7'] = suggested_list[6]
+    with c38:
+        sg_button_8 = st.button(suggested_list[7], on_click = click_button_sg8)
+        st.session_state['sg_button_8'] = suggested_list[7]
+
     if 'max_page' not in st.session_state:
         st.session_state['max_page'] = 10
-
-    c31, c32 = st.columns((6, 4))
-    with c31:
+    c41, c42 = st.columns((6, 4))
+    with c41:
         st.markdown("<div id='linkto_bottom'></div>", unsafe_allow_html=True)
         if int(st.session_state['max_page']) > 1:
             page = st.slider('Page No:', 1, int(st.session_state['max_page']), key = 'page')
