@@ -92,6 +92,13 @@ def load_suggested_keywords(post_params):
     res = requests.post('http://localhost:{}/{}'.format(port, api_route), json = post_params)
     return res
 
+@st.cache(allow_output_mutation=True)
+def load_suggested_questions(post_params):
+    port = 7101
+    api_route = 'haystack_question_generation'
+    res = requests.post('http://localhost:{}/{}'.format(port, api_route), json = post_params)
+    return res
+
 st.set_page_config(layout="wide")
 
 def change_retriever_type():
@@ -313,13 +320,17 @@ if query: # or query != '' :
             plt.axis('off')
             st.pyplot(fig)
 
-    st.write("#### Suggested Keywords:")
     post_params = {'query': st.session_state.query, 'filters': {}, }
     if len(st.session_state['filter_central_bank']) > 0:
         post_params['filters']['central_bank'] = st.session_state['filter_central_bank']
     if len(st.session_state['filter_keyword']) > 0:
         post_params['filters']['keyword'] = st.session_state['filter_keyword']
-    suggested_keywords = load_suggested_keywords(post_params).json()
+    if st.session_state['search_type'] == 'by keywords':
+        st.write("#### Suggested Keywords:")
+        suggested_keywords = load_suggested_keywords(post_params).json()
+    else:
+        st.write("#### Suggested Questions:")
+        suggested_keywords = load_suggested_questions(post_params).json()
     suggested_list = suggested_keywords['suggested_keywords'][:12]
 
     c31, c32, cx1 = st.columns((4, 4, 4))
