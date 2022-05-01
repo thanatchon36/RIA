@@ -68,8 +68,9 @@ def card(id_val, source, context, pdf_html, doc_meta):
     """, unsafe_allow_html=True)
 
 @st.cache(allow_output_mutation=True)
-def search_query(search_type, post_params, port, api_route, doc_len):
+def search_query(search_type, post_params, api_route, doc_len):
     st.session_state.page = 1
+    port = 5101
     res = requests.post('http://localhost:{}/{}'.format(port, api_route), json = post_params)
     return res
 
@@ -87,14 +88,14 @@ def load_wc(wc_text):
 
 @st.cache(allow_output_mutation=True)
 def load_suggested_keywords(post_params):
-    port = 7101
+    port = 5101
     api_route = 'haystack_collocation'
     res = requests.post('http://localhost:{}/{}'.format(port, api_route), json = post_params)
     return res
 
 @st.cache(allow_output_mutation=True)
 def load_suggested_questions(post_params):
-    port = 7101
+    port = 5101
     api_route = 'haystack_question_generation'
     res = requests.post('http://localhost:{}/{}'.format(port, api_route), json = post_params)
     return res
@@ -228,9 +229,8 @@ if query: # or query != '' :
             post_params['filters']['central_bank'] = st.session_state['filter_central_bank']
         if len(st.session_state['filter_keyword']) > 0:
             post_params['filters']['keyword'] = st.session_state['filter_keyword']
-        port = 5001 + int(doc_len)
         api_route = 'haystack_{}_reader_pipe'.format(doc_len)
-        res = search_query(search_type, post_params, port, api_route, doc_len)
+        res = search_query(search_type, post_params, api_route, doc_len)
         st.write("## Results:")
         res_df = pd.DataFrame(res.json()['answers'])
         if len(res_df) > 0:
@@ -257,9 +257,8 @@ if query: # or query != '' :
             post_params['filters']['central_bank'] = st.session_state['filter_central_bank']
         if len(st.session_state['filter_keyword']) > 0:
             post_params['filters']['keyword'] = st.session_state['filter_keyword']
-        port = 5001 + int(doc_len)
         api_route = 'haystack_{}_retriever_pipe'.format(doc_len)
-        res = search_query(search_type, post_params, port, api_route, doc_len)
+        res = search_query(search_type, post_params, api_route, doc_len)
         st.write("## Results:")
         res_df = pd.DataFrame(res.json()['documents'])
         if len(res_df) > 0:
