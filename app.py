@@ -335,35 +335,43 @@ if query: # or query != '' :
 
     c31, c32, cx1 = st.columns((4, 4, 4))
     with c31:
-        sg_button_1 = st.button(suggested_list[0], on_click = click_button_sg1)
-        st.session_state['sg_button_1'] = suggested_list[0]
+        if len(suggested_list) >= 1:
+            sg_button_1 = st.button(suggested_list[0], on_click = click_button_sg1)
+            st.session_state['sg_button_1'] = suggested_list[0]
     with c32:
-        sg_button_2 = st.button(suggested_list[1], on_click = click_button_sg2)
-        st.session_state['sg_button_2'] = suggested_list[1]
+        if len(suggested_list) >= 2:
+            sg_button_2 = st.button(suggested_list[1], on_click = click_button_sg2)
+            st.session_state['sg_button_2'] = suggested_list[1]
 
     c33, c34, cx2 = st.columns((4, 4, 4))
     with c33:
-        sg_button_3 = st.button(suggested_list[2], on_click = click_button_sg3)
-        st.session_state['sg_button_3'] = suggested_list[2]
+        if len(suggested_list) >= 3:
+            sg_button_3 = st.button(suggested_list[2], on_click = click_button_sg3)
+            st.session_state['sg_button_3'] = suggested_list[2]
     with c34:
-        sg_button_4 = st.button(suggested_list[3], on_click = click_button_sg4)
-        st.session_state['sg_button_4'] = suggested_list[3]
+        if len(suggested_list) >= 4:
+            sg_button_4 = st.button(suggested_list[3], on_click = click_button_sg4)
+            st.session_state['sg_button_4'] = suggested_list[3]
 
     c35, c36, cx3 = st.columns((4, 4, 4))
     with c35:
-        sg_button_5 = st.button(suggested_list[4], on_click = click_button_sg5)
-        st.session_state['sg_button_5'] = suggested_list[4]
+        if len(suggested_list) >= 5:
+            sg_button_5 = st.button(suggested_list[4], on_click = click_button_sg5)
+            st.session_state['sg_button_5'] = suggested_list[4]
     with c36:
-        sg_button_6 = st.button(suggested_list[5], on_click = click_button_sg6)
-        st.session_state['sg_button_6'] = suggested_list[5]
+        if len(suggested_list) >= 6:
+            sg_button_6 = st.button(suggested_list[5], on_click = click_button_sg6)
+            st.session_state['sg_button_6'] = suggested_list[5]
 
     c37, c38, cx4 = st.columns((4, 4, 4))
     with c37:
-        sg_button_7 = st.button(suggested_list[6], on_click = click_button_sg7)
-        st.session_state['sg_button_7'] = suggested_list[6]
+        if len(suggested_list) >= 7:
+            sg_button_7 = st.button(suggested_list[6], on_click = click_button_sg7)
+            st.session_state['sg_button_7'] = suggested_list[6]
     with c38:
-        sg_button_8 = st.button(suggested_list[7], on_click = click_button_sg8)
-        st.session_state['sg_button_8'] = suggested_list[7]
+        if len(suggested_list) >= 8:
+            sg_button_8 = st.button(suggested_list[7], on_click = click_button_sg8)
+            st.session_state['sg_button_8'] = suggested_list[7]
 
     if 'max_page' not in st.session_state:
         st.session_state['max_page'] = 10
