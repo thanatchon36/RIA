@@ -247,7 +247,7 @@ if query: # or query != '' :
             res_df['keyword'] = res_df['meta'].apply(lambda x: x['keyword'])
             res_df['file_name'] = res_df['meta'].apply(lambda x: x['file_name'].split('/')[-1])
             res_df['full_path'] = res_df['meta'].apply(lambda x: x['file_name'].split('/')[-4:])
-            st.session_state['m ax_page'] = res_df['page'].max()
+            st.session_state['max_page'] = res_df['page'].max()
 
     elif search_type == 'by keywords':
         post_params = {'query': st.session_state.query, 'top_k_retriever': top_k_retriever, 'top_k_reader': top_k_reader,
