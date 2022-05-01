@@ -15,8 +15,8 @@ from nltk.corpus import stopwords
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
-DEFAULT_NUMBER_OF_ANSWERS = 3
-DEFAULT_DOCS_FROM_RETRIEVER = 6
+DEFAULT_NUMBER_OF_ANSWERS = 10
+DEFAULT_DOCS_FROM_RETRIEVER = 100
 
 wc_params = dict(
     # background_color = "black",
@@ -143,7 +143,7 @@ with st.sidebar:
     top_k_reader = st.sidebar.slider(
         "Max. number of answers:",
         min_value=1,
-        max_value=10,
+        max_value=20,
         value=DEFAULT_NUMBER_OF_ANSWERS,
         step=1,
         key = "top_k_reader"
@@ -151,7 +151,7 @@ with st.sidebar:
     top_k_retriever = st.sidebar.slider(
         "Max. number of documents from retriever:",
         min_value=1,
-        max_value=100,
+        max_value=200,
         value=DEFAULT_DOCS_FROM_RETRIEVER,
         step=1,
         key = "top_k_retriever"
