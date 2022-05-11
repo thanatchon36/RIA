@@ -68,7 +68,7 @@ def card(id_val, source, context, pdf_html, doc_meta):
     """, unsafe_allow_html=True)
 
 @st.cache(allow_output_mutation=True)
-def search_query(search_type, post_params, api_route, doc_len):
+def search_query(search_type, post_params, api_route, doc_len, distinct_mode):
     st.session_state.page = 1
     port = 5101
     res = requests.post('http://localhost:{}/{}'.format(port, api_route), json = post_params)
@@ -169,6 +169,12 @@ with st.sidebar:
         key = "doc_len",
         index = 1,
     )
+    distinct_mode = st.radio(
+        "Distinct Mode:",
+        ('No Distinct', 'Distinct Document', 'Distinct Central Bank'),
+        key = "distinct_mode",
+        index = 0,
+    )
 
 st.markdown("""
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
@@ -230,7 +236,7 @@ if query: # or query != '' :
         if len(st.session_state['filter_keyword']) > 0:
             post_params['filters']['keyword'] = st.session_state['filter_keyword']
         api_route = 'haystack_{}_reader_pipe'.format(doc_len)
-        res = search_query(search_type, post_params, api_route, doc_len)
+        res = search_query(search_type, post_params, api_route, doc_len, distinct_mode)
         st.write("## Results:")
         res_df = pd.DataFrame(res.json()['answers'])
         if len(res_df) > 0:
@@ -239,14 +245,19 @@ if query: # or query != '' :
             content_df = pd.DataFrame(res.json()['documents'])
             content_df.rename(columns = {'id': 'document_id'}, inplace = True)
             res_df = pd.merge(res_df, content_df[['document_id', 'meta', 'content']], on = 'document_id', how = 'left')
+            res_df['file_name'] = res_df['meta'].apply(lambda x: x['file_name'].split('/')[-1])
+            res_df['central_bank'] = res_df['meta'].apply(lambda x: x['central_bank'])
+            res_df['keyword'] = res_df['meta'].apply(lambda x: x['keyword'])
+            if distinct_mode == 'Distinct Document':
+                res_df = res_df.groupby('file_name').first().reset_index()
+            elif distinct_mode == 'Distinct Central Bank':
+                res_df = res_df.groupby('central_bank').first().reset_index()
             res_df['page'] = res_df.index
             res_df['page'] = res_df['page'] / 10
             res_df['page'] = res_df['page'].astype(int)
             res_df['page'] = res_df['page'] + 1
-            res_df['central_bank'] = res_df['meta'].apply(lambda x: x['central_bank'])
-            res_df['keyword'] = res_df['meta'].apply(lambda x: x['keyword'])
-            res_df['file_name'] = res_df['meta'].apply(lambda x: x['file_name'].split('/')[-1])
             res_df['full_path'] = res_df['meta'].apply(lambda x: x['file_name'].split('/')[-4:])
+            st.session_state['res_df'] = res_df.to_dict()
             st.session_state['max_page'] = res_df['page'].max()
 
     elif search_type == 'by keywords':
@@ -258,59 +269,58 @@ if query: # or query != '' :
         if len(st.session_state['filter_keyword']) > 0:
             post_params['filters']['keyword'] = st.session_state['filter_keyword']
         api_route = 'haystack_{}_retriever_pipe'.format(doc_len)
-        res = search_query(search_type, post_params, api_route, doc_len)
+        res = search_query(search_type, post_params, api_route, doc_len, distinct_mode)
         st.write("## Results:")
         res_df = pd.DataFrame(res.json()['documents'])
         if len(res_df) > 0:
             res_df['score'] = res_df['score'].astype(float)
+            res_df['file_name'] = res_df['meta'].apply(lambda x: x['file_name'].split('/')[-1])
+            res_df['central_bank'] = res_df['meta'].apply(lambda x: x['central_bank'])
+            res_df['keyword'] = res_df['meta'].apply(lambda x: x['keyword'])
+            if distinct_mode == 'Distinct Document':
+                res_df = res_df.groupby('file_name').first().reset_index()
+            elif distinct_mode == 'Distinct Central Bank':
+                res_df = res_df.groupby('central_bank').first().reset_index()
             res_df['page'] = res_df.index
             res_df['page'] = res_df['page'] / 10
             res_df['page'] = res_df['page'].astype(int)
             res_df['page'] = res_df['page'] + 1
-            res_df['central_bank'] = res_df['meta'].apply(lambda x: x['central_bank'])
-            res_df['keyword'] = res_df['meta'].apply(lambda x: x['keyword'])
-            res_df['file_name'] = res_df['meta'].apply(lambda x: x['file_name'].split('/')[-1])
             res_df['full_path'] = res_df['meta'].apply(lambda x: x['file_name'].split('/')[-4:])
+            st.session_state['res_df'] = res_df.to_dict()
             st.session_state['max_page'] = res_df['page'].max()
-
+            
     # Init State Sessioin
     if 'page' not in st.session_state:
         st.session_state['page'] = 1
-
     c21, c22 = st.columns((6, 4))
     
     with c21:
         wc_text = ""
         if len(res_df) > 0:
             filter_res_df = res_df[res_df['page'] == st.session_state['page']]
-
             for i in range(len(filter_res_df)):
                 score = round(filter_res_df['score'].values[i] * 100, 2)
                 content = filter_res_df['content'].values[i]
                 wc_text = wc_text + " " + content
-
                 if st.session_state['search_type'] == 'by keywords':
-                    for each_j in get_found_token(query, content):
+                    for each_j in get_found_token(st.session_state['query'], content):
                         content = content.replace(each_j, f"<mark>{each_j}</mark>")
-
                 answer = ""
                 if 'answer' in list(filter_res_df.columns):
                     answer = filter_res_df['answer'].values[i]
                     content = content.replace(answer,  str(annotation(answer, "ANSWER", "#8ef")))
-
                 doc_meta = "{} | {} | {}".format(filter_res_df['central_bank'].values[i], 
-                                                 filter_res_df['keyword'].values[i],
-                                                 filter_res_df['file_name'].values[i],
+                                                    filter_res_df['keyword'].values[i],
+                                                    filter_res_df['file_name'].values[i],
                                                 )
-
                 pdf_html = """<a href="http://pc140032646.bot.or.th/pdf/{}/{}/{}/{}" class="card-link">PDF</a> <a href='#linkto_top' class="card-link">Link to top</a> <a href='#linkto_bottom' class="card-link">Link to bottom</a>""".format(filter_res_df['full_path'].values[i][0],filter_res_df['full_path'].values[i][1],filter_res_df['full_path'].values[i][2],filter_res_df['full_path'].values[i][3])
-
                 card('Relevance: {}'.format(score), 
                     answer,
                     '...{}...'.format(content),
                     pdf_html,
                     doc_meta
                 )
+
     with c22:
         if len(wc_text) > 0:
             wc_fig = load_wc(wc_text)
