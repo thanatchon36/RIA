@@ -1,4 +1,4 @@
-import streamlit as st
+ปimport streamlit as st
 from annotated_text import annotation
 import streamlit.components.v1 as components
 import time
@@ -100,7 +100,7 @@ def load_suggested_questions(post_params):
     res = requests.post('http://localhost:{}/{}'.format(port, api_route), json = post_params)
     return res
 
-st.set_page_config(layout="wide")
+st.set_page_config(layout="wide", page_title = 'RIA', page_icon = 'fav.png')
 
 def change_retriever_type():
     if st.session_state['search_type'] == 'by keywords':
