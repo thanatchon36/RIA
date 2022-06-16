@@ -1,4 +1,4 @@
-ปimport streamlit as st
+import streamlit as st
 from annotated_text import annotation
 import streamlit.components.v1 as components
 import time
